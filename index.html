@@ -46,6 +46,12 @@
         border: none;
         border-radius: 4px;
         cursor: pointer;
+        transition: opacity 0.3s;
+    }
+
+    .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
     }
 
     .container {
@@ -222,6 +228,9 @@ function DiscoverService() {
 
 //设置要显示的字符串
 function SetString(){
+    let setBtn = document.querySelector('button[onclick="SetString()"]');
+    setBtn.disabled = true;
+    
     let str=document.getElementById("ssid").value;
     str+="+";
     str+=document.getElementById("password").value;
@@ -247,7 +256,10 @@ function SetString(){
         WifiSetting_char.writeValue(buf.buffer);
     }
 
-    
+    // 5秒后恢复按钮
+    setTimeout(() => {
+        setBtn.disabled = false;
+    }, 5000);
 }
 
 //初始化用户界面
