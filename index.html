@@ -234,9 +234,23 @@ function SetString(){
     let ssid = document.getElementById("ssid").value;
     let password = document.getElementById("password").value;
     
-    // 保存当前输入的值到localStorage
-    localStorage.setItem('lastSsid', ssid);
-    localStorage.setItem('lastPassword', password);
+    // 尝试保存到localStorage
+    try {
+        localStorage.setItem('lastSsid', ssid);
+        localStorage.setItem('lastPassword', password);
+        add_log("[Storage] Successfully saved SSID and password");
+    } catch (e) {
+        add_log("[Storage Error] Failed to save: " + e.message);
+        
+        // 尝试使用sessionStorage作为备选
+        try {
+            sessionStorage.setItem('lastSsid', ssid);
+            sessionStorage.setItem('lastPassword', password);
+            add_log("[Storage] Using sessionStorage as fallback");
+        } catch (e2) {
+            add_log("[Storage Error] SessionStorage also failed: " + e2.message);
+        }
+    }
     
     let str = ssid + "+" + password;
     add_log("set str: " + str);
@@ -269,15 +283,27 @@ function SetString(){
 
 //初始化用户界面
 function InitUI() {
-    // 从localStorage读取上次保存的值
-    const lastSsid = localStorage.getItem('lastSsid');
-    const lastPassword = localStorage.getItem('lastPassword');
-    
-    if (lastSsid) {
-        document.getElementById("ssid").value = lastSsid;
-    }
-    if (lastPassword) {
-        document.getElementById("password").value = lastPassword;
+    try {
+        // 首先尝试从localStorage读取
+        let lastSsid = localStorage.getItem('lastSsid');
+        let lastPassword = localStorage.getItem('lastPassword');
+        
+        // 如果localStorage中没有，尝试从sessionStorage读取
+        if (!lastSsid && !lastPassword) {
+            lastSsid = sessionStorage.getItem('lastSsid');
+            lastPassword = sessionStorage.getItem('lastPassword');
+        }
+        
+        if (lastSsid) {
+            document.getElementById("ssid").value = lastSsid;
+            add_log("[Storage] Restored SSID from storage");
+        }
+        if (lastPassword) {
+            document.getElementById("password").value = lastPassword;
+            add_log("[Storage] Restored password from storage");
+        }
+    } catch (e) {
+        add_log("[Storage Error] Failed to read storage: " + e.message);
     }
 }
 
