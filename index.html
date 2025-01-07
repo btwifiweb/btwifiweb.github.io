@@ -127,6 +127,9 @@ var Connected_Device;
 var Connected_Server;
 var Connected = false;
 
+let lastSsid;
+let lastPassword;
+
 //连接设备或断开连接
 function DiscoveOrDisConnect() {
     if (Connected) {
@@ -257,18 +260,12 @@ function SetString(){
     let password = document.getElementById("password").value;
     
     // 保存到cookie，设置30天过期
-    let lastSsid = getCookie('lastSsid');
-    let lastPassword = getCookie('lastPassword');
     add_log("lastSsid: " + lastSsid);
     add_log("lastPassword: " + lastPassword);    
 
     setCookie('lastSsid', ssid, 30);
     setCookie('lastPassword', password, 30);
     add_log("[Cookie] Saved SSID and password");
-    lastSsid = getCookie('lastSsid');
-    lastPassword = getCookie('lastPassword');
-    add_log("lastSsid: " + lastSsid);
-    add_log("lastPassword: " + lastPassword);
     let str = ssid + "+" + password;
     add_log("set str: " + str);
 
@@ -301,8 +298,8 @@ function SetString(){
 //初始化用户界面
 function InitUI() {
     // 从cookie中读取数据
-    let lastSsid = getCookie('lastSsid');
-    let lastPassword = getCookie('lastPassword');
+    lastSsid = getCookie('lastSsid');
+    lastPassword = getCookie('lastPassword');
     
     if (lastSsid) {
         document.getElementById("ssid").value = lastSsid;
