@@ -260,7 +260,10 @@ function SetString(){
     setCookie('lastSsid', ssid, 30);
     setCookie('lastPassword', password, 30);
     add_log("[Cookie] Saved SSID and password");
-    
+    let lastSsid = getCookie('lastSsid');
+    let lastPassword = getCookie('lastPassword');
+    add_log("lastSsid: " + lastSsid);
+    add_log("lastPassword: " + lastPassword);
     let str = ssid + "+" + password;
     add_log("set str: " + str);
 
