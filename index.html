@@ -104,7 +104,81 @@
         var Connected_Server;
         var Connected = false;
 
-        // 这里保留原有的所有 JavaScript 函数...
+        async function DiscoverDevice() {
+            try {
+                add_log("正在扫描设备...");
+                const device = await navigator.bluetooth.requestDevice({
+                    filters: [{ services: [WIFISETTING_SERVICE] }]
+                });
+                add_log("找到设备: " + device.name);
+                ConnectDevice(device);
+            } catch (error) {
+                add_log("扫描失败: " + error);
+            }
+        }
+
+        async function ConnectDevice(device) {
+            try {
+                add_log("正在连接到设备...");
+                Connected_Device = device;
+                const server = await device.gatt.connect();
+                Connected_Server = server;
+                Connected = true;
+                add_log("连接成功");
+                UpdateUI();
+                DiscoverService();
+            } catch (error) {
+                add_log("连接失败: " + error);
+                Connected = false;
+                UpdateUI();
+            }
+        }
+
+        async function DiscoverService() {
+            try {
+                add_log("正在发现服务...");
+                const service = await Connected_Server.getPrimaryService(WIFISETTING_SERVICE);
+                const characteristic = await service.getCharacteristic(WIFISETTING_CHARACTERISTIC);
+                WifiSetting_char = characteristic;
+                add_log("服务发现成功");
+            } catch (error) {
+                add_log("服务发现失败: " + error);
+            }
+        }
+
+        async function SetString() {
+            if (!Connected || !WifiSetting_char) {
+                add_log("请先连接设备");
+                return;
+            }
+
+            try {
+                const ssid = document.getElementById("ssid").value;
+                const password = document.getElementById("password").value;
+                const data = ssid + "," + password;
+                const encoder = new TextEncoder();
+                await WifiSetting_char.writeValue(encoder.encode(data));
+                add_log("WiFi 设置已发送");
+            } catch (error) {
+                add_log("设置失败: " + error);
+            }
+        }
+
+        function InitUI() {
+            document.getElementById("ssid").value = "";
+            document.getElementById("password").value = "";
+            document.getElementById("text").innerHTML = "";
+        }
+
+        function UpdateUI() {
+            const scanButton = document.getElementById("scan");
+            if (Connected) {
+                scanButton.innerHTML = "断开连接";
+            } else {
+                scanButton.innerHTML = "扫描";
+            }
+        }
+
         function DiscoveOrDisConnect() {
             if (Connected) {
                 Connected_Device.gatt.disconnect();
@@ -116,9 +190,6 @@
                 UpdateUI();
             }
         }
-
-        // 保留其他所有原有函数...
-        // DiscoverDevice, ConnectDevice, DiscoverService, SetString, InitUI, UpdateUI, add_log
 
         function add_log(log) {
             var obj = document.getElementById("text");
