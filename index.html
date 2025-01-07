@@ -86,6 +86,28 @@
 
 <script>
 
+// Cookie操作的辅助函数
+function setCookie(name, value, days) {
+    let expires = "";
+    if (days) {
+        let date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        expires = "; expires=" + date.toUTCString();
+    }
+    document.cookie = name + "=" + (value || "") + expires + "; path=/";
+}
+
+function getCookie(name) {
+    let nameEQ = name + "=";
+    let ca = document.cookie.split(';');
+    for(let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+    }
+    return null;
+}
+
 // 蓝牙设备提供的服务的 UUIDs
 
 var GENERIC_ACCESS_SERVICE = "00001800-0000-1000-8000-00805f9b34fb";
@@ -234,23 +256,10 @@ function SetString(){
     let ssid = document.getElementById("ssid").value;
     let password = document.getElementById("password").value;
     
-    // 尝试保存到localStorage
-    try {
-        localStorage.setItem('lastSsid', ssid);
-        localStorage.setItem('lastPassword', password);
-        add_log("[Storage] Successfully saved SSID and password");
-    } catch (e) {
-        add_log("[Storage Error] Failed to save: " + e.message);
-        
-        // 尝试使用sessionStorage作为备选
-        try {
-            sessionStorage.setItem('lastSsid', ssid);
-            sessionStorage.setItem('lastPassword', password);
-            add_log("[Storage] Using sessionStorage as fallback");
-        } catch (e2) {
-            add_log("[Storage Error] SessionStorage also failed: " + e2.message);
-        }
-    }
+    // 保存到cookie，设置30天过期
+    setCookie('lastSsid', ssid, 30);
+    setCookie('lastPassword', password, 30);
+    add_log("[Cookie] Saved SSID and password");
     
     let str = ssid + "+" + password;
     add_log("set str: " + str);
@@ -283,27 +292,17 @@ function SetString(){
 
 //初始化用户界面
 function InitUI() {
-    try {
-        // 首先尝试从localStorage读取
-        let lastSsid = localStorage.getItem('lastSsid');
-        let lastPassword = localStorage.getItem('lastPassword');
-        
-        // 如果localStorage中没有，尝试从sessionStorage读取
-        if (!lastSsid && !lastPassword) {
-            lastSsid = sessionStorage.getItem('lastSsid');
-            lastPassword = sessionStorage.getItem('lastPassword');
-        }
-        
-        if (lastSsid) {
-            document.getElementById("ssid").value = lastSsid;
-            add_log("[Storage] Restored SSID from storage");
-        }
-        if (lastPassword) {
-            document.getElementById("password").value = lastPassword;
-            add_log("[Storage] Restored password from storage");
-        }
-    } catch (e) {
-        add_log("[Storage Error] Failed to read storage: " + e.message);
+    // 从cookie中读取数据
+    let lastSsid = getCookie('lastSsid');
+    let lastPassword = getCookie('lastPassword');
+    
+    if (lastSsid) {
+        document.getElementById("ssid").value = lastSsid;
+        add_log("[Cookie] Restored SSID");
+    }
+    if (lastPassword) {
+        document.getElementById("password").value = lastPassword;
+        add_log("[Cookie] Restored password");
     }
 }
 
