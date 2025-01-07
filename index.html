@@ -255,11 +255,10 @@ function UpdateUI() {
 }
 
 function add_log( log ) {
-    // var obj = document.getElementById("text");
-    // obj.innerHTML += log;
-    // obj.innerHTML += "<br>";
-    // obj.scrollTop = obj.scrollHeight;
-    console.log(log);
+    var obj = document.getElementById("text");
+    obj.innerHTML += log;
+    obj.innerHTML += "<br>";
+    obj.scrollTop = obj.scrollHeight;
 }
 
 InitUI();
@@ -276,12 +275,12 @@ UpdateUI();
 <p>
 
 <button class="btn" type="button" onclick="SetString()">set</button>
-<!-- <br>
+<br>
 <br>
 <br>
 <br>
 <h1>log:</h1>
-<div class="textarea" contenteditable="true" id="text"></div> -->
+<div class="textarea" contenteditable="true" id="text"></div>
 
 </body>
 </html>
