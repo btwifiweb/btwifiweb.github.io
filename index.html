@@ -260,9 +260,6 @@ function SetString(){
     let password = document.getElementById("password").value;
     
     // 保存到cookie，设置30天过期
-    add_log("lastSsid: " + lastSsid);
-    add_log("lastPassword: " + lastPassword);    
-
     setCookie('lastSsid', ssid, 30);
     setCookie('lastPassword', password, 30);
     add_log("[Cookie] Saved SSID and password");
