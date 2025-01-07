@@ -132,6 +132,10 @@ let lastPassword;
 
 //连接设备或断开连接
 function DiscoveOrDisConnect() {
+
+    document.getElementById("ssid").value = lastSsid;
+    document.getElementById("password").value = lastPassword;
+
     if (Connected) {
         Connected_Device.gatt.disconnect();
         add_log("===>Connection is broken<===");
