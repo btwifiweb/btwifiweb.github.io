@@ -231,9 +231,14 @@ function SetString(){
     let setBtn = document.querySelector('button[onclick="SetString()"]');
     setBtn.disabled = true;
     
-    let str=document.getElementById("ssid").value;
-    str+="+";
-    str+=document.getElementById("password").value;
+    let ssid = document.getElementById("ssid").value;
+    let password = document.getElementById("password").value;
+    
+    // 保存当前输入的值到localStorage
+    localStorage.setItem('lastSsid', ssid);
+    localStorage.setItem('lastPassword', password);
+    
+    let str = ssid + "+" + password;
     add_log("set str: " + str);
 
     let arr = new Array();
@@ -264,7 +269,16 @@ function SetString(){
 
 //初始化用户界面
 function InitUI() {
-
+    // 从localStorage读取上次保存的值
+    const lastSsid = localStorage.getItem('lastSsid');
+    const lastPassword = localStorage.getItem('lastPassword');
+    
+    if (lastSsid) {
+        document.getElementById("ssid").value = lastSsid;
+    }
+    if (lastPassword) {
+        document.getElementById("password").value = lastPassword;
+    }
 }
 
 //更新UI
