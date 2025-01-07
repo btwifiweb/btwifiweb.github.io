@@ -127,14 +127,10 @@ var Connected_Device;
 var Connected_Server;
 var Connected = false;
 
-let lastSsid;
-let lastPassword;
+
 
 //连接设备或断开连接
 function DiscoveOrDisConnect() {
-
-    document.getElementById("ssid").value = lastSsid;
-    document.getElementById("password").value = lastPassword;
 
     if (Connected) {
         Connected_Device.gatt.disconnect();
@@ -301,6 +297,8 @@ function SetString(){
 
 //初始化用户界面
 function InitUI() {
+    let lastSsid;
+    let lastPassword;
     // 从cookie中读取数据
     lastSsid = getCookie('lastSsid');
     lastPassword = getCookie('lastPassword');
