@@ -155,7 +155,7 @@ function DiscoverDevice() {
         //acceptAllDevices: true,
        // optionalServices: [ GENERIC_ACCESS_SERVICE ],
        // optionalServices: [CUSTOMER_SERVICE1, GENERIC_ACCESS_SERVICE, GENERIC_ATTRIBUTE_SERVICE, DEVICE_INFORMATION_SERVICE]
-       optionalServices: [WIFISETTING_SERVICE]
+       optionalServices: [WIFISETTING_SERVICE, GENERIC_ACCESS_SERVICE, GENERIC_ATTRIBUTE_SERVICE, DEVICE_INFORMATION_SERVICE]
     };
 
     navigator.bluetooth.requestDevice(options)
@@ -176,7 +176,7 @@ function DiscoverDevice() {
 function ConnectDevice() {
     Connected_Device.gatt.connect().then(
         function (server) {
-            add_log("> connect to GATT server：" + server.device.id);
+            add_log("> connect to GATT server:" + server.device.id);
             add_log("> connect success=" + server.connected);
             //更新UI的信息
             Connected = true;
@@ -201,7 +201,8 @@ function ConnectDevice() {
 
 //发现蓝牙设备的服务和特性
 function DiscoverService() {
-    add_log("> Searching Service......\n> Server：" + Connected_Server);
+    add_log("> Searching Service......");
+    add_log("> Server:" + Connected_Server);
 
     //已发现的服务
     let ServicesDiscovered = 0;
@@ -211,11 +212,11 @@ function DiscoverService() {
 
             //服务总数
             let ServiceSum = Services.length;
-            add_log("> Find Service number：" + ServiceSum);
+            add_log("> Find Service number:" + ServiceSum);
 
             Services.forEach(service => {
 
-                add_log("> Service UUID：" + service.uuid);
+                add_log("> Service UUID:" + service.uuid);
 
                 service.getCharacteristics().then(Characteristics => {
                     add_log("> Service: " + service.uuid);
@@ -225,10 +226,11 @@ function DiscoverService() {
                     let CharacteristicsDiscovered = 0;
                     //所有的特性
                     let CharacteristicsSum = Characteristics.length;
-
+                    add_log("> Find Characteristic number:" + CharacteristicsSum);
                     Characteristics.forEach(Characteristic => {
 
-                        CharacteristicsDiscovered++; add_log('>> CHARACTERISTIC(UUID): ' + Characteristic.uuid);
+                        CharacteristicsDiscovered++; 
+                        add_log('>> CHARACTERISTIC(UUID): ' + Characteristic.uuid);
                         if( Characteristic.uuid == WIFISETTING_CHARACTERISTIC){
                             WifiSetting_char = Characteristic;
                             add_log(">find wifi setting characteristic");
