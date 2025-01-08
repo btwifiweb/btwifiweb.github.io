@@ -367,13 +367,9 @@ function add_log( log ) {
 // 处理接收到的数据
 function handleCharacteristicValueChanged(event) {
     let setBtn = document.querySelector('button[onclick="SetString()"]');
-
+    
     const value = event.target.value;
-    
-    // 将接收到的 DataView 转换为 Uint8Array
     const array = new Uint8Array(value.buffer);
-    
-    // 示例：将数据转换为字符串
     let str = '';
     array.forEach(byte => {
         str += String.fromCharCode(byte);
@@ -381,9 +377,21 @@ function handleCharacteristicValueChanged(event) {
     
     add_log("receive data: " + str);
     if(str == "connect success"){
-        alert("WiFi连接成功!");
+        Swal.fire({
+            title: '连接成功!',
+            text: 'WiFi配置已完成',
+            icon: 'success',
+            confirmButtonText: '确定',
+            confirmButtonColor: '#007bff'
+        });
     }else if(str == "length not match"){
-        alert("数据发送失败!");
+        Swal.fire({
+            title: '发送失败',
+            text: '数据长度不匹配',
+            icon: 'error',
+            confirmButtonText: '确定',
+            confirmButtonColor: '#007bff'
+        });
     }
     setBtn.disabled = false;    
 }
@@ -429,12 +437,15 @@ document.addEventListener('DOMContentLoaded', function() {
     UpdateUI();
 });
 
+// 添加 SweetAlert2 库
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </script>
 </head>
 
 <body>
 <div class="container">
-    <h1>Bluetooth Config WiFi 7</h1>
+    <h1>Bluetooth Config WiFi 1</h1>
     <button id="scan" class="btn" type="button" onclick="DiscoveOrDisConnect()">scan</button>
     
     <h2>Ssid:</h2>
