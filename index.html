@@ -122,7 +122,11 @@ var WIFISETTING_SERVICE = "6455e670-a146-11e2-9e96-0800200c9afe";
 
 var WIFISETTING_CHARACTERISTIC = "6455e670-a146-11e2-9e96-0800200c9a66";
 
+var SAMPLE_CHARACTERISTIC = "6455e670-a146-11e2-9e96-0800200c9a68";
+
 var WifiSetting_char;
+
+var Sample_char;
 //设备抽象
 var Connected_Device;
 //连接状态
@@ -235,28 +239,33 @@ function DiscoverService() {
                             WifiSetting_char = Characteristic;
                             add_log(">find wifi setting characteristic");
                             
+
+                            
+
+                        }
+                        if (Characteristic.uuid == SAMPLE_CHARACTERISTIC){
+                            Sample_char = Characteristic;
+                            add_log(">find sample characteristic");
                             // 检查特征值的属性
                             add_log("Properties:");
-                            add_log("- notify: " + WifiSetting_char.properties.notify);
-                            add_log("- indicate: " + WifiSetting_char.properties.indicate);
+                            add_log("- notify: " + Sample_char.properties.notify);
+                            add_log("- indicate: " + Sample_char.properties.indicate);
                             
-                            if (!WifiSetting_char.properties.notify && !WifiSetting_char.properties.indicate) {
+                            if (!Sample_char.properties.notify && !Sample_char.properties.indicate) {
                                 add_log("This characteristic does not support notification!");
                             }else{
                                 // 如果支持，则启动通知
-                                WifiSetting_char.startNotifications()
+                                Sample_char.startNotifications()
                                     .then(() => {
                                         add_log(">enable data notification");
                                         
                                         // 添加数据接收事件监听器
-                                        WifiSetting_char.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
+                                        Sample_char.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
                                     })
                                     .catch(error => {
                                         add_log("enable data notification failed: " + error);
                                     });
                             }
-                            
-
                         }
                         if (ServicesDiscovered == ServiceSum && CharacteristicsDiscovered == CharacteristicsSum) {
                             add_log("===>Service search complete<===");
@@ -386,6 +395,28 @@ function stopNotifications() {
     }
 }
 
+// 使用 readValue() 定期读取数据
+function pollCharacteristic() {
+    if (WifiSetting_char) {
+        WifiSetting_char.readValue()
+            .then(value => {
+                // 处理读取到的数据
+                const array = new Uint8Array(value.buffer);
+                let str = '';
+                array.forEach(byte => {
+                    str += String.fromCharCode(byte);
+                });
+                add_log("read data: " + str);
+            })
+            .catch(error => {
+                add_log("read data failed: " + error);
+            });
+    }
+}
+
+// 每秒读取一次数据
+//setInterval(pollCharacteristic, 1000);
+
 document.addEventListener('DOMContentLoaded', function() {
     InitUI();
     UpdateUI();
@@ -396,7 +427,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <body>
 <div class="container">
-    <h1>Bluetooth Config WiFi 4</h1>
+    <h1>Bluetooth Config WiFi 5</h1>
     <button id="scan" class="btn" type="button" onclick="DiscoveOrDisConnect()">scan</button>
     
     <h2>Ssid:</h2>
