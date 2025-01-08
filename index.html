@@ -1,132 +1,57 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <style type="text/css">    
     .textarea{
-        width: 90%;
+        width: 800px;
         min-height: 20px;
-        max-height: 400px;
-        margin: 10px auto;
+        max-height: 800px;
+        _height: 120px;
+        margin-left: auto;
+        margin-right: auto;
         padding: 3px;
         outline: 0;
         border: 1px solid #a0b3d6;
-        font-size: 16px;
+        font-size: 20px;
         line-height: 24px;
+        padding: 2px;
         word-wrap: break-word;
         overflow-x: hidden;
         overflow-y: auto;
+     
         border-color: rgba(82, 168, 236, 0.8);
         box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 8px rgba(82, 168, 236, 0.6);
-        scrollbar-width: thin;
-        scrollbar-color: #888 #f1f1f1;
     }
-
-    .textarea::-webkit-scrollbar {
-        width: 8px;
-    }
-
-    .textarea::-webkit-scrollbar-track {
-        background: #f1f1f1;
-    }
-
-    .textarea::-webkit-scrollbar-thumb {
-        background: #888;
-        border-radius: 4px;
-    }
-
-    .textarea::-webkit-scrollbar-thumb:hover {
-        background: #555;
-    }
-
     .text{
-        width: 90%;
+        width: 400px;
         min-height: 20px;
         max-height: 800px;
-        margin: 10px auto;
-        padding: 8px;
+        _height: 120px;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 3px;
         outline: 0;
         border: 1px solid #a0b3d6;
-        font-size: 16px;
+        font-size: 30px;
         line-height: 24px;
+        padding: 2px;
         word-wrap: break-word;
         overflow-x: hidden;
         overflow-y: auto;
+     
         border-color: rgba(82, 168, 236, 0.8);
         box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 8px rgba(82, 168, 236, 0.6);
-        box-sizing: border-box;
     }
     .btn{
-        padding: 8px 16px;
-        font-size: 16px;
-        margin: 10px 0;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: opacity 0.3s;
+        padding: 10px 20px 10px 20px;
+        font-size: 30px;
     }
 
-    .btn:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-    }
-
-    .container {
-        padding: 15px;
-        max-width: 100%;
-        margin: 0 auto;
-    }
-
-    h1 {
-        font-size: 24px;
-        margin: 10px 0;
-    }
-
-    h2 {
-        font-size: 18px;
-        margin: 10px 0 5px 0;
-    }
-
-    @media screen and (min-width: 768px) {
-        .container {
-            max-width: 750px;
-        }
-        .text {
-            width: 400px;
-        }
-        .textarea {
-            width: 800px;
-        }
-    }
 </style>
 
 
 <script>
-
-// Cookie操作的辅助函数
-function setCookie(name, value, days) {
-    let expires = "";
-    if (days) {
-        let date = new Date();
-        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-        expires = "; expires=" + date.toUTCString();
-    }
-    document.cookie = name + "=" + (value || "") + expires + "; path=/";
-}
-
-function getCookie(name) {
-    let nameEQ = name + "=";
-    let ca = document.cookie.split(';');
-    for(let i = 0; i < ca.length; i++) {
-        let c = ca[i];
-        while (c.charAt(0) == ' ') c = c.substring(1, c.length);
-        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
-    }
-    return null;
-}
 
 // 蓝牙设备提供的服务的 UUIDs
 
@@ -147,11 +72,8 @@ var Connected_Device;
 var Connected_Server;
 var Connected = false;
 
-
-
 //连接设备或断开连接
 function DiscoveOrDisConnect() {
-
     if (Connected) {
         Connected_Device.gatt.disconnect();
         add_log("===>Connection is broken<===");
@@ -273,17 +195,9 @@ function DiscoverService() {
 
 //设置要显示的字符串
 function SetString(){
-    let setBtn = document.querySelector('button[onclick="SetString()"]');
-    setBtn.disabled = true;
-    
-    let ssid = document.getElementById("ssid").value;
-    let password = document.getElementById("password").value;
-    
-    // 保存到cookie，设置30天过期
-    setCookie('lastSsid', ssid, 30);
-    setCookie('lastPassword', password, 30);
-    add_log("[Cookie] Saved SSID and password");
-    let str = ssid + "+" + password;
+    let str=document.getElementById("ssid").value;
+    str+="+";
+    str+=document.getElementById("password").value;
     add_log("set str: " + str);
 
     let arr = new Array();
@@ -306,28 +220,12 @@ function SetString(){
         WifiSetting_char.writeValue(buf.buffer);
     }
 
-    // 5秒后恢复按钮
-    setTimeout(() => {
-        setBtn.disabled = false;
-    }, 5000);
+    
 }
 
 //初始化用户界面
 function InitUI() {
-    let lastSsid;
-    let lastPassword;
-    // 从cookie中读取数据
-    lastSsid = getCookie('lastSsid');
-    lastPassword = getCookie('lastPassword');
-    
-    if (lastSsid) {
-        document.getElementById("ssid").value = lastSsid;
-        add_log("[Cookie] Restored SSID");
-    }
-    if (lastPassword) {
-        document.getElementById("password").value = lastPassword;
-        add_log("[Cookie] Restored password");
-    }
+
 }
 
 //更新UI
@@ -348,32 +246,26 @@ function add_log( log ) {
     obj.scrollTop = obj.scrollHeight;
 }
 
-
-document.addEventListener('DOMContentLoaded', function() {
-    InitUI();
-    UpdateUI();
-});
-
+InitUI();
+UpdateUI();
 </script>
 </head>
 
 <body>
-<div class="container">
-    <h1>Bluetooth Config WiFi 0</h1>
-    <button id="connect" class="btn" type="button" onclick="DiscoveOrDisConnect()">scan</button>
-    
-    <h2>Ssid:</h2>
-    <input class="text" type="text" id="ssid">
-    
-    <h2>Password:</h2>
-    <input class="text" type="text" id="password">
-    
-    <div>
-        <button class="btn" type="button" onclick="SetString()">set</button>
-    </div>
-    
-    <h1>Log:</h1>
-    <div class="textarea" contenteditable="true" id="text"></div>
-</div>
+
+<h1>bluetooth config wifi</h1>
+<button id="scan" class="btn" type="button" onclick="DiscoveOrDisConnect()">scan</button>
+<h2>Ssid:</h2><input class="text" type="text" id="ssid">
+<h2>Password:</h2><input class="text" type="text" id="password">
+<p>
+
+<button class="btn" type="button" onclick="SetString()">set</button>
+<br>
+<br>
+<br>
+<br>
+<h1>log:</h1>
+<div class="textarea" contenteditable="true" id="text"></div>
+
 </body>
 </html>
