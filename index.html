@@ -235,17 +235,28 @@ function DiscoverService() {
                             WifiSetting_char = Characteristic;
                             add_log(">find wifi setting characteristic");
                             
-                            // 启动通知
-                            WifiSetting_char.startNotifications()
-                                .then(() => {
-                                    add_log(">开启数据通知");
-                                    
-                                    // 添加数据接收事件监听器
-                                    WifiSetting_char.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
-                                })
-                                .catch(error => {
-                                    add_log("启动通知失败: " + error);
-                                });
+                            // 检查特征值的属性
+                            add_log("Properties:");
+                            add_log("- notify: " + WifiSetting_char.properties.notify);
+                            add_log("- indicate: " + WifiSetting_char.properties.indicate);
+                            
+                            if (!WifiSetting_char.properties.notify && !WifiSetting_char.properties.indicate) {
+                                add_log("This characteristic does not support notification!");
+                            }else{
+                                // 如果支持，则启动通知
+                                WifiSetting_char.startNotifications()
+                                    .then(() => {
+                                        add_log(">enable data notification");
+                                        
+                                        // 添加数据接收事件监听器
+                                        WifiSetting_char.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
+                                    })
+                                    .catch(error => {
+                                        add_log("enable data notification failed: " + error);
+                                    });
+                            }
+                            
+
                         }
                         if (ServicesDiscovered == ServiceSum && CharacteristicsDiscovered == CharacteristicsSum) {
                             add_log("===>Service search complete<===");
