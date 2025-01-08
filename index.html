@@ -363,7 +363,8 @@ function SetString(){
     // 5秒后恢复按钮
     setTimeout(() => {
         if(send_complete == false){
-            showDialog('send faild', 'send timeout', false); 
+            add_log("send timeout");
+            showDialog('send timeout', 'send again', false); 
             setBtn.disabled = false;
         }
     }, 1000);
@@ -487,7 +488,7 @@ function closeDialog() {
 
 <body>
 <div class="container">
-    <h1>Bluetooth Config WiFi 5</h1>
+    <h1>Bluetooth Config WiFi 6</h1>
     <button id="scan" class="btn" type="button" onclick="DiscoveOrDisConnect()">scan</button>
     
     <h2>Ssid:</h2>
