@@ -171,7 +171,7 @@ var Connected_Device;
 var Connected_Server;
 var Connected = false;
 
-
+var send_complete = false;
 
 //连接设备或断开连接
 function DiscoveOrDisConnect() {
@@ -329,7 +329,7 @@ function DiscoverService() {
 function SetString(){
     let setBtn = document.querySelector('button[onclick="SetString()"]');
     setBtn.disabled = true;
-    
+    send_complete = false;
     let ssid = document.getElementById("ssid").value;
     let password = document.getElementById("password").value;
     
@@ -362,8 +362,11 @@ function SetString(){
 
     // 5秒后恢复按钮
     setTimeout(() => {
-        setBtn.disabled = false;
-    }, 10000);
+        if(send_complete == false){
+            showDialog('send faild', 'send timeout', false); 
+            setBtn.disabled = false;
+        }
+    }, 1000);
 }
 
 //初始化用户界面
@@ -404,6 +407,7 @@ function add_log( log ) {
 
 // 处理接收到的数据
 function handleCharacteristicValueChanged(event) {
+    send_complete = true;
     let setBtn = document.querySelector('button[onclick="SetString()"]');
     
     const value = event.target.value;
@@ -415,9 +419,11 @@ function handleCharacteristicValueChanged(event) {
     
     add_log("receive data: " + str);
     if(str == "connect success"){
-        showDialog('连接成功!', 'WiFi配置已完成', true);
+        showDialog('connect success', 'WiFi config success', true);
+    }else if(str == "connect failed"){
+        showDialog('connect failed', 'WiFi config failed', false);  
     }else if(str == "length not match"){
-        showDialog('发送失败', '数据长度不匹配', false);
+        showDialog('send failed', 'data length not match', false);
     }
     setBtn.disabled = false;    
 }
@@ -481,7 +487,7 @@ function closeDialog() {
 
 <body>
 <div class="container">
-    <h1>Bluetooth Config WiFi 4</h1>
+    <h1>Bluetooth Config WiFi 5</h1>
     <button id="scan" class="btn" type="button" onclick="DiscoveOrDisConnect()">scan</button>
     
     <h2>Ssid:</h2>
