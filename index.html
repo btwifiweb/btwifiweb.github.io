@@ -328,7 +328,6 @@ function add_log( log ) {
     obj.scrollTop = obj.scrollHeight;
 }
 
-
 document.addEventListener('DOMContentLoaded', function() {
     InitUI();
     UpdateUI();
@@ -340,7 +339,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <body>
 <div class="container">
     <h1>Bluetooth Config WiFi</h1>
-    <button id="connect" class="btn" type="button" onclick="DiscoveOrDisConnect()">scan</button>
+    <button id="scan" class="btn" type="button" onclick="DiscoveOrDisConnect()">scan</button>
     
     <h2>Ssid:</h2>
     <input class="text" type="text" id="ssid">
