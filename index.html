@@ -367,7 +367,7 @@ function SetString(){
             showDialog('send timeout', 'send again', false); 
             setBtn.disabled = false;
         }
-    }, 1000);
+    }, 3000);
 }
 
 //初始化用户界面
@@ -421,12 +421,15 @@ function handleCharacteristicValueChanged(event) {
     add_log("receive data: " + str);
     if(str == "connect success"){
         showDialog('connect success', 'WiFi config success', true);
+        setBtn.disabled = false;
     }else if(str == "connect failed"){
         showDialog('connect failed', 'WiFi config failed', false);  
+        setBtn.disabled = false;
     }else if(str == "length not match"){
         showDialog('send failed', 'data length not match', false);
+        setBtn.disabled = false;
     }
-    setBtn.disabled = false;    
+        
 }
 
 // 如果需要停止接收数据
