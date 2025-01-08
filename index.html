@@ -83,10 +83,46 @@
             width: 800px;
         }
     }
-</style>
 
-<!-- 添加 SweetAlert2 库 -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    /* 添加对话框样式 */
+    .custom-dialog {
+        padding: 20px;
+        border: none;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .dialog-content {
+        text-align: center;
+    }
+    
+    .dialog-title {
+        color: #333;
+        margin-bottom: 15px;
+    }
+    
+    .dialog-button {
+        padding: 8px 16px;
+        margin-top: 15px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    
+    .success-icon {
+        color: #28a745;
+        font-size: 48px;
+        margin-bottom: 15px;
+    }
+    
+    .error-icon {
+        color: #dc3545;
+        font-size: 48px;
+        margin-bottom: 15px;
+    }
+</style>
 
 <script>
 
@@ -379,21 +415,9 @@ function handleCharacteristicValueChanged(event) {
     
     add_log("receive data: " + str);
     if(str == "connect success"){
-        Swal.fire({
-            title: '连接成功!',
-            text: 'WiFi配置已完成',
-            icon: 'success',
-            confirmButtonText: '确定',
-            confirmButtonColor: '#007bff'
-        });
+        showDialog('连接成功!', 'WiFi配置已完成', true);
     }else if(str == "length not match"){
-        Swal.fire({
-            title: '发送失败',
-            text: '数据长度不匹配',
-            icon: 'error',
-            confirmButtonText: '确定',
-            confirmButtonColor: '#007bff'
-        });
+        showDialog('发送失败', '数据长度不匹配', false);
     }
     setBtn.disabled = false;    
 }
@@ -439,12 +463,30 @@ document.addEventListener('DOMContentLoaded', function() {
     UpdateUI();
 });
 
+function showDialog(title, message, isSuccess) {
+    const dialog = document.getElementById('resultDialog');
+    const iconDiv = document.getElementById('dialogIcon');
+    document.getElementById('dialogTitle').textContent = title;
+    document.getElementById('dialogMessage').textContent = message;
+    
+    iconDiv.innerHTML = isSuccess ? 
+        '✓' : '✕';
+    iconDiv.className = isSuccess ? 
+        'success-icon' : 'error-icon';
+            
+    dialog.showModal();
+}
+
+function closeDialog() {
+    document.getElementById('resultDialog').close();
+}
+
 </script>
 </head>
 
 <body>
 <div class="container">
-    <h1>Bluetooth Config WiFi 2</h1>
+    <h1>Bluetooth Config WiFi 3</h1>
     <button id="scan" class="btn" type="button" onclick="DiscoveOrDisConnect()">scan</button>
     
     <h2>Ssid:</h2>
@@ -460,5 +502,15 @@ document.addEventListener('DOMContentLoaded', function() {
     <h1>Log:</h1>
     <div class="textarea" contenteditable="true" id="text"></div>
 </div>
+
+<!-- 在 container div 后添加对话框元素 -->
+<dialog id="resultDialog" class="custom-dialog">
+    <div class="dialog-content">
+        <div id="dialogIcon"></div>
+        <h2 id="dialogTitle" class="dialog-title"></h2>
+        <p id="dialogMessage"></p>
+        <button class="dialog-button" onclick="closeDialog()">确定</button>
+    </div>
+</dialog>
 </body>
 </html>
