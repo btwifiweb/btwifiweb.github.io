@@ -325,7 +325,7 @@ function SetString(){
     // 5秒后恢复按钮
     setTimeout(() => {
         setBtn.disabled = false;
-    }, 5000);
+    }, 10000);
 }
 
 //初始化用户界面
@@ -366,6 +366,8 @@ function add_log( log ) {
 
 // 处理接收到的数据
 function handleCharacteristicValueChanged(event) {
+    let setBtn = document.querySelector('button[onclick="SetString()"]');
+
     const value = event.target.value;
     
     // 将接收到的 DataView 转换为 Uint8Array
@@ -378,7 +380,12 @@ function handleCharacteristicValueChanged(event) {
     });
     
     add_log("receive data: " + str);
-    
+    if(str == "connect success"){
+        alert("WiFi连接成功!");
+    }else if(str == "length not match"){
+        alert("数据发送失败!");
+    }
+    setBtn.disabled = false;    
 }
 
 // 如果需要停止接收数据
