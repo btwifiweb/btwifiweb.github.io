@@ -155,7 +155,7 @@ function DiscoverDevice() {
         //acceptAllDevices: true,
        // optionalServices: [ GENERIC_ACCESS_SERVICE ],
        // optionalServices: [CUSTOMER_SERVICE1, GENERIC_ACCESS_SERVICE, GENERIC_ATTRIBUTE_SERVICE, DEVICE_INFORMATION_SERVICE]
-       optionalServices: [WIFISETTING_SERVICE, GENERIC_ACCESS_SERVICE, GENERIC_ATTRIBUTE_SERVICE, DEVICE_INFORMATION_SERVICE]
+       optionalServices: [WIFISETTING_SERVICE]
     };
 
     navigator.bluetooth.requestDevice(options)
@@ -234,6 +234,18 @@ function DiscoverService() {
                         if( Characteristic.uuid == WIFISETTING_CHARACTERISTIC){
                             WifiSetting_char = Characteristic;
                             add_log(">find wifi setting characteristic");
+                            
+                            // 启动通知
+                            WifiSetting_char.startNotifications()
+                                .then(() => {
+                                    add_log(">开启数据通知");
+                                    
+                                    // 添加数据接收事件监听器
+                                    WifiSetting_char.addEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
+                                })
+                                .catch(error => {
+                                    add_log("启动通知失败: " + error);
+                                });
                         }
                         if (ServicesDiscovered == ServiceSum && CharacteristicsDiscovered == CharacteristicsSum) {
                             add_log("===>Service search complete<===");
@@ -330,6 +342,37 @@ function add_log( log ) {
     obj.innerHTML += log;
     obj.innerHTML += "<br>";
     obj.scrollTop = obj.scrollHeight;
+}
+
+// 处理接收到的数据
+function handleCharacteristicValueChanged(event) {
+    const value = event.target.value;
+    
+    // 将接收到的 DataView 转换为 Uint8Array
+    const array = new Uint8Array(value.buffer);
+    
+    // 示例：将数据转换为字符串
+    let str = '';
+    array.forEach(byte => {
+        str += String.fromCharCode(byte);
+    });
+    
+    add_log("receive data: " + str);
+    
+}
+
+// 如果需要停止接收数据
+function stopNotifications() {
+    if (WifiSetting_char) {
+        WifiSetting_char.stopNotifications()
+            .then(() => {
+                add_log(">stop data notification");
+                WifiSetting_char.removeEventListener('characteristicvaluechanged', handleCharacteristicValueChanged);
+            })
+            .catch(error => {
+                add_log("stop data notification failed: " + error);
+            });
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
