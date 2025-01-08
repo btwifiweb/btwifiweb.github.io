@@ -468,12 +468,7 @@ function showDialog(title, message, isSuccess) {
     const iconDiv = document.getElementById('dialogIcon');
     document.getElementById('dialogTitle').textContent = title;
     document.getElementById('dialogMessage').textContent = message;
-    
-    iconDiv.innerHTML = isSuccess ? 
-        '✓' : '✕';
-    iconDiv.className = isSuccess ? 
-        'success-icon' : 'error-icon';
-            
+               
     dialog.showModal();
 }
 
@@ -486,7 +481,7 @@ function closeDialog() {
 
 <body>
 <div class="container">
-    <h1>Bluetooth Config WiFi 3</h1>
+    <h1>Bluetooth Config WiFi 4</h1>
     <button id="scan" class="btn" type="button" onclick="DiscoveOrDisConnect()">scan</button>
     
     <h2>Ssid:</h2>
