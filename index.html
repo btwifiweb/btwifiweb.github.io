@@ -178,9 +178,11 @@ var sendTimeoutId = null;
 
 //连接设备或断开连接
 function DiscoveOrDisConnect() {
-    // 添加连接状态检查
-    if (Connected_Device && Connected_Device.gatt.connected) {
-        Connected = true;
+
+    if (Connected) {
+        Connected_Device.gatt.disconnect();
+        add_log("===>Connection is broken<===");
+        Connected = false;
         UpdateUI();
     }
     else {
@@ -218,14 +220,6 @@ function DiscoverDevice() {
 
 //连接到蓝牙设备
 function ConnectDevice() {
-    // 添加连接前的状态检查
-    if (Connected_Device.gatt.connected) {
-        add_log("Already connected to device");
-        Connected = true;
-        UpdateUI();
-        return;
-    }
-
     Connected_Device.gatt.connect().then(
         function (server) {
             add_log("> connect to GATT server:" + server.device.id);
@@ -513,7 +507,7 @@ function closeDialog() {
 
 <body>
 <div class="container">
-    <h1>Bluetooth Config WiFi 10</h1>
+    <h1>Bluetooth Config WiFi 9</h1>
     <button id="scan" class="btn" type="button" onclick="DiscoveOrDisConnect()">scan</button>
     
     <h2>Ssid:</h2>
