@@ -173,6 +173,9 @@ var Connected = false;
 
 var send_complete = false;
 
+// 添加一个全局变量来存储timeout的ID
+var sendTimeoutId = null;
+
 //连接设备或断开连接
 function DiscoveOrDisConnect() {
 
@@ -360,12 +363,18 @@ function SetString(){
         WifiSetting_char.writeValue(buf.buffer);
     }
 
-    // 5秒后恢复按钮
-    setTimeout(() => {
+    // 清除之前的timeout
+    if (sendTimeoutId) {
+        clearTimeout(sendTimeoutId);
+        sendTimeoutId = null;
+    }
+    
+    // 设置新的timeout并保存ID
+    sendTimeoutId = setTimeout(() => {
         if(send_complete == false){
             add_log("send timeout");
-            showDialog('send timeout', 'send again', false); 
-            setBtn.disabled = false;
+            add_log("send again");
+            SetString();
         }
     }, 3000);
 }
@@ -409,6 +418,12 @@ function add_log( log ) {
 // 处理接收到的数据
 function handleCharacteristicValueChanged(event) {
     send_complete = true;
+    // 清除timeout
+    if (sendTimeoutId) {
+        clearTimeout(sendTimeoutId);
+        sendTimeoutId = null;
+    }
+    
     let setBtn = document.querySelector('button[onclick="SetString()"]');
     
     const value = event.target.value;
@@ -426,8 +441,8 @@ function handleCharacteristicValueChanged(event) {
         showDialog('connect failed', 'WiFi config failed', false);  
         setBtn.disabled = false;
     }else if(str == "length not match"){
-        showDialog('send failed', 'data length not match', false);
-        setBtn.disabled = false;
+        add_log("send again");
+        SetString();
     }
         
 }
