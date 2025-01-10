@@ -176,6 +176,9 @@ var send_complete = false;
 // 添加一个全局变量来存储timeout的ID
 var sendTimeoutId = null;
 
+// 修改全局变量定义部分，添加debug模式检测
+var isDebugMode = (new URLSearchParams(window.location.search)).has('debug');
+
 //连接设备或断开连接
 function DiscoveOrDisConnect() {
 
@@ -396,6 +399,10 @@ function InitUI() {
         document.getElementById("password").value = lastPassword;
         add_log("[Cookie] Restored password");
     }
+
+    // 根据debug模式设置日志区域显示状态
+    const logArea = document.getElementById("logArea");
+    logArea.style.display = isDebugMode ? "block" : "none";
 }
 
 //更新UI
@@ -520,8 +527,10 @@ function closeDialog() {
         <button class="btn" type="button" onclick="SetString()">set</button>
     </div>
     
-    <h1>Log:</h1>
-    <div class="textarea" contenteditable="true" id="text"></div>
+    <div id="logArea">
+        <h1>Log:</h1>
+        <div class="textarea" contenteditable="true" id="text"></div>
+    </div>
 </div>
 
 <!-- 在 container div 后添加对话框元素 -->
