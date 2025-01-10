@@ -415,7 +415,7 @@ function SetString(){
             add_log("send again");
             SetString();
         }
-    }, 2000);
+    }, 1000);
 }
 
 //初始化用户界面
@@ -468,11 +468,7 @@ function handleCharacteristicValueChanged(event) {
     
     let setBtn = document.querySelector('button[onclick="SetString()"]');
     
-    // 移除 loading 动画
-    const spinner = setBtn.querySelector('.loading-spinner');
-    if (spinner) {
-        spinner.remove();
-    }
+
     
     const value = event.target.value;
     const array = new Uint8Array(value.buffer);
@@ -484,9 +480,19 @@ function handleCharacteristicValueChanged(event) {
     add_log("receive data: " + str);
     if(str == "connect success"){
         showDialog('connect success', 'WiFi config success', true);
+        // 移除 loading 动画
+        const spinner = setBtn.querySelector('.loading-spinner');
+        if (spinner) {
+            spinner.remove();
+        }
         setBtn.disabled = false;
     }else if(str == "connect failed"){
         showDialog('connect failed', 'WiFi config failed', false);  
+        // 移除 loading 动画
+        const spinner = setBtn.querySelector('.loading-spinner');
+        if (spinner) {
+            spinner.remove();
+        }
         setBtn.disabled = false;
     }else if(str == "length not match"){
         add_log("send again");
@@ -554,7 +560,7 @@ function closeDialog() {
 
 <body>
 <div class="container">
-    <h1>Bluetooth Config WiFi 11</h1>
+    <h1>Bluetooth Config WiFi 1</h1>
     <button id="scan" class="btn" type="button" onclick="DiscoveOrDisConnect()">scan</button>
     
     <h2>Ssid:</h2>
