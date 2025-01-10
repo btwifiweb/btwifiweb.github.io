@@ -360,7 +360,17 @@ function DiscoverService() {
 //设置要显示的字符串
 function SetString(){
     let setBtn = document.querySelector('button[onclick="SetString()"]');
+    let btnText = setBtn.querySelector('span');
     setBtn.disabled = true;
+    
+    // 检查是否已存在 spinner
+    let existingSpinner = setBtn.querySelector('.loading-spinner');
+    if (!existingSpinner) {
+        const spinner = document.createElement('span');
+        spinner.className = 'loading-spinner';
+        setBtn.appendChild(spinner);
+    }
+    
     send_complete = false;
     let ssid = document.getElementById("ssid").value;
     let password = document.getElementById("password").value;
@@ -451,13 +461,18 @@ function add_log( log ) {
 // 处理接收到的数据
 function handleCharacteristicValueChanged(event) {
     send_complete = true;
-    // 清除timeout
     if (sendTimeoutId) {
         clearTimeout(sendTimeoutId);
         sendTimeoutId = null;
     }
     
     let setBtn = document.querySelector('button[onclick="SetString()"]');
+    
+    // 移除 loading 动画
+    const spinner = setBtn.querySelector('.loading-spinner');
+    if (spinner) {
+        spinner.remove();
+    }
     
     const value = event.target.value;
     const array = new Uint8Array(value.buffer);
@@ -539,7 +554,7 @@ function closeDialog() {
 
 <body>
 <div class="container">
-    <h1>Bluetooth Config WiFi 10</h1>
+    <h1>Bluetooth Config WiFi 11</h1>
     <button id="scan" class="btn" type="button" onclick="DiscoveOrDisConnect()">scan</button>
     
     <h2>Ssid:</h2>
@@ -549,7 +564,9 @@ function closeDialog() {
     <input class="text" type="text" id="password">
     
     <div>
-        <button class="btn" type="button" onclick="SetString()">set</button>
+        <button class="btn btn-with-spinner" type="button" onclick="SetString()">
+            <span>set</span>
+        </button>
     </div>
     
     <div id="logArea">
