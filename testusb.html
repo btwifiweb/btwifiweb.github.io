@@ -5,36 +5,103 @@
     <meta charset="utf-8">
 </head>
 <body>
-    <h1>USB设备列表</h1>
     <button onclick="getUSBDevices()">获取USB设备</button>
+    <div id="deviceAlert" style="color: red;"></div>
     <div id="deviceList"></div>
 
     <script>
+        // 保存已授权设备的列表
+        let authorizedDevices = new Set();
+
         async function getUSBDevices() {
             try {
-                // 请求USB权限并获取设备列表
-                const devices = await navigator.usb.requestDevice({ filters: [] });
+
+                const device = await navigator.usb.requestDevice({
+                    filters: [{ vendorId: 0x5a9 }]
+                });
+                
+                // 保存新授权的设备信息
+                const deviceId = `${device.vendorId}-${device.productId}`;
+                authorizedDevices.add(deviceId);
+                
+                // 清除提示信息
+                document.getElementById('deviceAlert').textContent = '';
+                
+                // 显示设备信息
                 const deviceList = document.getElementById('deviceList');
-                
-                // 清空之前的列表
                 deviceList.innerHTML = '';
-                
-                // 创建设备信息显示
-                const deviceInfo = document.createElement('div');
-                deviceInfo.innerHTML = `
-                    <h3>设备信息:</h3>
-                    <p>制造商ID: 0x${devices.vendorId.toString(16)}</p>
-                    <p>产品ID: 0x${devices.productId.toString(16)}</p>
-                    <p>制造商名称: ${devices.manufacturerName || '未知'}</p>
-                    <p>产品名称: ${devices.productName || '未知'}</p>
-                    <p>序列号: ${devices.serialNumber || '未知'}</p>
-                `;
-                
-                deviceList.appendChild(deviceInfo);
-                
+                displayDeviceInfo(device);
             } catch (error) {
                 console.error('获取USB设备失败:', error);
-                alert('获取USB设备失败: ' + error.message);
+                document.getElementById('deviceAlert').textContent = '获取USB设备失败';
+            }
+        }
+
+        // 页面加载完成后自动检测USB设备
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                console.log('USB设备检测已启动');
+                // 获取之前已授权的设备
+                const devices = await navigator.usb.getDevices({
+                    filters: [{ vendorId: 0x5a9 }]
+                });
+                // 保存已授权设备的信息
+                devices.forEach(device => {
+                    displayDeviceInfo(device);
+                });
+
+                // 监听USB设备插入
+                navigator.usb.addEventListener('connect', async event => {
+                    const device = event.device;
+                    const deviceId = `${device.vendorId}-${device.productId}`;
+                    console.log('检测到目标USB设备');
+                    if (device.vendorId === 0x5a9) {
+                        console.log('检测到目标USB设备');
+                        
+                        if (authorizedDevices.has(deviceId)) {
+                            // 如果是已授权设备，直接显示
+                            console.log('已授权设备自动连接');
+                            displayDeviceInfo(device);
+                        } else {
+                            // 如果是新设备，提示用户授权
+                            console.log('新设备需要授权');
+                            document.getElementById('deviceAlert').textContent = 
+                                '检测到新的USB设备，请点击"获取USB设备"按钮进行授权';
+                        }
+                    }
+                });
+
+                // 监听USB设备移除
+                navigator.usb.addEventListener('disconnect', event => {
+                    if (event.device.vendorId === 0x5a9) {
+                        console.log('目标USB设备已断开');
+                        removeDeviceInfo(event.device);
+                    }
+                });
+
+            } catch (error) {
+                console.error('USB设备检测失败:', error);
+            }
+        });
+
+        // 显示设备信息的函数
+        function displayDeviceInfo(device) {
+            const deviceList = document.getElementById('deviceList');
+            const deviceInfo = document.createElement('div');
+            deviceInfo.setAttribute('data-device-id', `${device.vendorId}-${device.productId}`);
+            deviceInfo.innerHTML = `
+                Vendor ID: 0x${device.vendorId.toString(16)}<br>
+                ProductID: 0x${device.productId.toString(16)}
+            `;
+            deviceList.appendChild(deviceInfo);
+        }
+
+        // 移除设备信息的函数
+        function removeDeviceInfo(device) {
+            const deviceId = `${device.vendorId}-${device.productId}`;
+            const deviceElement = document.querySelector(`[data-device-id="${deviceId}"]`);
+            if (deviceElement) {
+                deviceElement.remove();
             }
         }
     </script>
