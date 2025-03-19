@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>USB设备列表</title>
+    <meta charset="utf-8">
+</head>
+<body>
+    <h1>USB设备列表</h1>
+    <button onclick="getUSBDevices()">获取USB设备</button>
+    <div id="deviceList"></div>
+
+    <script>
+        async function getUSBDevices() {
+            try {
+                // 请求USB权限并获取设备列表
+                const devices = await navigator.usb.requestDevice({ filters: [] });
+                const deviceList = document.getElementById('deviceList');
+                
+                // 清空之前的列表
+                deviceList.innerHTML = '';
+                
+                // 创建设备信息显示
+                const deviceInfo = document.createElement('div');
+                deviceInfo.innerHTML = `
+                    <h3>设备信息:</h3>
+                    <p>制造商ID: 0x${devices.vendorId.toString(16)}</p>
+                    <p>产品ID: 0x${devices.productId.toString(16)}</p>
+                    <p>制造商名称: ${devices.manufacturerName || '未知'}</p>
+                    <p>产品名称: ${devices.productName || '未知'}</p>
+                    <p>序列号: ${devices.serialNumber || '未知'}</p>
+                `;
+                
+                deviceList.appendChild(deviceInfo);
+                
+            } catch (error) {
+                console.error('获取USB设备失败:', error);
+                alert('获取USB设备失败: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
