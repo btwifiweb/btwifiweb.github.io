@@ -8,21 +8,12 @@
     <button onclick="getUSBDevices()">获取USB设备</button>
     <div id="deviceAlert" style="color: red;"></div>
     <div id="deviceList"></div>
-
     <script>
-        // 保存已授权设备的列表
-        let authorizedDevices = new Set();
-
         async function getUSBDevices() {
             try {
-
                 const device = await navigator.usb.requestDevice({
                     filters: [{ vendorId: 0x5a9 }]
                 });
-                
-                // 保存新授权的设备信息
-                const deviceId = `${device.vendorId}-${device.productId}`;
-                authorizedDevices.add(deviceId);
                 
                 // 清除提示信息
                 document.getElementById('deviceAlert').textContent = '';
@@ -41,34 +32,20 @@
         document.addEventListener('DOMContentLoaded', async () => {
             try {
                 console.log('USB设备检测已启动');
-                // 获取之前已授权的设备
-                const devices = await navigator.usb.getDevices({
+
+                // 获取当前已连接的设备列表用于调试
+                const allDevices = await navigator.usb.getDevices();
+                console.log('当前已连接的所有USB设备:', allDevices);
+
+                // 获取之前已授权的目标设备
+                const targetDevices = await navigator.usb.getDevices({
                     filters: [{ vendorId: 0x5a9 }]
                 });
-                // 保存已授权设备的信息
-                devices.forEach(device => {
-                    displayDeviceInfo(device);
-                });
+                console.log('当前已连接的目标设备:', targetDevices);
 
-                // 监听USB设备插入
-                navigator.usb.addEventListener('connect', async event => {
-                    const device = event.device;
-                    const deviceId = `${device.vendorId}-${device.productId}`;
-                    console.log('检测到目标USB设备');
-                    if (device.vendorId === 0x5a9) {
-                        console.log('检测到目标USB设备');
-                        
-                        if (authorizedDevices.has(deviceId)) {
-                            // 如果是已授权设备，直接显示
-                            console.log('已授权设备自动连接');
-                            displayDeviceInfo(device);
-                        } else {
-                            // 如果是新设备，提示用户授权
-                            console.log('新设备需要授权');
-                            document.getElementById('deviceAlert').textContent = 
-                                '检测到新的USB设备，请点击"获取USB设备"按钮进行授权';
-                        }
-                    }
+                // 保存已授权设备的信息
+                targetDevices.forEach(device => {
+                    displayDeviceInfo(device);
                 });
 
                 // 监听USB设备移除
@@ -80,7 +57,7 @@
                 });
 
             } catch (error) {
-                console.error('USB设备检测失败:', error);
+                console.error('USB设备检测初始化失败:', error);
             }
         });
 
